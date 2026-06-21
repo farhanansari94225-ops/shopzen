@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🏫 Smart School Infinity – Complete</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* ===== CSS Variables ===== */
+    :root {
+      --primary: #0a1a2f; --primary-light: #1e3a5f; --primary-dark: #040d18;
+      --secondary: #f0b429; --secondary-light: #f8d55a; --accent: #2d9cdb;
+      --bg: #f0f4f8; --text: #1a202c; --card-bg: #ffffff;
+      --shadow: 0 8px 30px rgba(0,0,0,0.08); --radius: 16px;
+      --border: #e2e8f0; --header-bg: rgba(255,255,255,0.92);
+      --sidebar-width: 280px; --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f1724; --text: #e2e8f0; --card-bg: #1a2332;
+      --header-bg: rgba(15,23,36,0.92); --shadow: 0 8px 30px rgba(0,0,0,0.5);
+      --border: #2d3748;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Open Sans', sans-serif; background:var(--bg); color:var(--text);
+      line-height:1.7; transition:background 0.3s, color 0.3s; overflow-x:hidden;
+    }
+    ::-webkit-scrollbar { width:8px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--secondary); border-radius:10px; }
+
+    /* ===== Toast ===== */
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      padding: 12px 24px; border-radius: 30px; font-weight: 600;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2); z-index: 9999;
+      transition: all 0.4s; opacity: 0; transform: translateX(-50%) translateY(30px);
+      color: #fff; font-family: 'Open Sans', sans-serif;
+    }
+    .toast-success { background: #38a169; }
+    .toast-error { background: #e53e3e; }
+    .toast-info { background: #2d9cdb; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ===== Progress Bar ===== */
+    #progress-bar {
+      position:fixed; top:0; left:0; height:4px;
+      background:linear-gradient(90deg, var(--secondary), var(--accent));
+      z-index:9999; width:0%; transition:width 0.1s;
+    }
+    .container { max-width:1300px; margin:0 auto; padding:0 24px; }
+
+    /* ===== Header ===== */
+    header {
+      position:fixed; top:0; left:0; width:100%;
+      background:var(--header-bg); backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border); z-index:1000;
+      padding:0 24px; height:72px; display:flex; align-items:center;
+      transition:height 0.3s, box-shadow 0.3s;
+    }
+    header.scrolled { height:60px; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+    .header-inner { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1300px; margin:0 auto; }
+
+    .logo-area {
+      display:flex; align-items:center; gap:10px; cursor:pointer;
+      padding:4px 12px 4px 6px; border-radius:40px;
+      transition:background 0.3s; user-select:none; flex-shrink:0;
+    }
+    .logo-area:hover { background:rgba(43,108,176,0.06); }
+    .logo-area .hamburger { font-size:1.5rem; color:var(--secondary); transition:transform 0.3s; }
+    .logo-area:hover .hamburger { transform:scale(1.1); }
+    .logo-area .logo-text {
+      font-family:'Inter', sans-serif; font-size:1.4rem; font-weight:900;
+      color:var(--primary); display:flex; align-items:center; gap:6px;
+    }
+    .logo-area .logo-text i { color:var(--secondary); }
+    .logo-area .logo-text span { color:var(--secondary); }
+
+    .header-controls { display:flex; align-items:center; gap:12px; }
+    .header-search {
+      display:flex; align-items:center; background:var(--card-bg);
+      border:1px solid var(--border); border-radius:30px;
+      padding:4px 12px; transition:border 0.3s;
+    }
+    .header-search:focus-within { border-color:var(--accent); }
+    .header-search input {
+      border:none; background:transparent; color:var(--text);
+      font-size:0.9rem; padding:6px 8px; width:180px; outline:none;
+    }
+    .header-search button { background:none; border:none; color:var(--text); cursor:pointer; }
+    .theme-toggle {
+      background:none; border:none; font-size:1.2rem; color:var(--text);
+      cursor:pointer; padding:6px 10px; border-radius:30px;
+      transition:background 0.3s;
+    }
+    .theme-toggle:hover { background:rgba(43,108,176,0.1); }
+
+    /* Auth Section */
+    #authSection {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .login-btn {
+      background:var(--secondary); color:#1a202c; border:none;
+      padding:8px 20px; border-radius:30px; font-weight:700;
+      cursor:pointer; transition:0.3s;
+    }
+    .login-btn:hover { transform:scale(1.04); background:var(--secondary-light); }
+    #userProfile {
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    #userNameDisplay { font-weight: 600; color: var(--text); }
+    #logoutBtn {
+      background: #e53e3e; color: white; padding: 6px 14px;
+      border: none; border-radius: 30px; cursor: pointer;
+      font-weight: 600; transition: 0.3s;
+    }
+    #logoutBtn:hover { background: #c53030; }
+
+    /* ===== Sidebar ===== */
+    .sidebar-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.4); z-index:999; opacity:0; visibility:hidden;
+      transition:opacity 0.3s, visibility 0.3s; backdrop-filter:blur(4px);
+    }
+    .sidebar-overlay.open { opacity:1; visibility:visible; }
+
+    .sidebar {
+      position:fixed; top:0; left:-100%; width:var(--sidebar-width);
+      max-width:85vw; height:100%; background:var(--card-bg);
+      border-right:1px solid var(--border); z-index:1001;
+      padding:24px 0 30px; overflow-y:auto;
+      transition:left 0.35s cubic-bezier(0.4,0,0.2,1);
+      box-shadow:4px 0 30px rgba(0,0,0,0.1);
+      display:flex; flex-direction:column;
+    }
+    .sidebar.open { left:0; }
+    .sidebar-header {
+      padding:0 20px 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+    }
+    .sidebar-header .logo-text {
+      font-family:'Inter', sans-serif; font-size:1.2rem; font-weight:900;
+      color:var(--primary); display:flex; align-items:center; gap:8px;
+    }
+    .sidebar-header .logo-text i { color:var(--secondary); }
+    .sidebar-header .logo-text span { color:var(--secondary); }
+    .sidebar-close {
+      background:none; border:none; font-size:1.4rem; color:var(--text);
+      cursor:pointer; padding:4px 8px; border-radius:30px;
+      transition:background 0.3s;
+    }
+    .sidebar-close:hover { background:rgba(43,108,176,0.1); }
+
+    .sidebar-nav { flex:1; padding:16px 12px 20px; overflow-y:auto; }
+    .sidebar-category {
+      font-size:0.7rem; text-transform:uppercase; letter-spacing:1px;
+      opacity:0.5; padding:10px 16px 4px; font-weight:700;
+    }
+    .sidebar-nav a {
+      display:flex; align-items:center; gap:12px; padding:8px 16px;
+      border-radius:var(--radius); font-weight:600; font-size:0.9rem;
+      color:var(--text); opacity:0.75; text-decoration:none;
+      transition:all 0.2s; cursor:pointer; margin-bottom:2px;
+    }
+    .sidebar-nav a .icon { width:28px; text-align:center; font-size:1.1rem; flex-shrink:0; }
+    .sidebar-nav a:hover { background:rgba(43,108,176,0.08); opacity:1; }
+    .sidebar-nav a.active { background:rgba(43,108,176,0.12); color:var(--accent); opacity:1; }
+    .sidebar-nav a.active .icon { color:var(--secondary); }
+    .sidebar-footer {
+      padding:16px 20px 0; border-top:1px solid var(--border);
+      font-size:0.75rem; opacity:0.5; text-align:center; flex-shrink:0;
+    }
+
+    /* ===== Pages ===== */
+    .page { display:none; padding:90px 0 60px; animation:fadeUp 0.5s ease; }
+    .page.active { display:block; }
+    @keyframes fadeUp { 0%{opacity:0;transform:translateY(20px)} 100%{opacity:1;transform:translateY(0)} }
+
+    /* ===== News Ticker ===== */
+    .news-ticker {
+      position:fixed; top:72px; left:0; width:100%;
+      background:var(--secondary); color:var(--primary-dark);
+      padding:6px 0; z-index:998; font-weight:600; font-size:0.85rem;
+      overflow:hidden; white-space:nowrap; border-bottom:1px solid var(--border);
+      transition:top 0.3s;
+    }
+    .news-ticker.scrolled { top:60px; }
+    .news-ticker .ticker-content { display:inline-block; padding-left:100%; animation:ticker 35s linear infinite; }
+    .news-ticker .ticker-content span { margin:0 30px; }
+    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+
+    /* ===== Hero Slider ===== */
+    .hero-slider {
+      position:relative; border-radius:var(--radius); overflow:hidden;
+      box-shadow:var(--shadow); background:var(--primary-dark);
+    }
+    .hero-slider .slides { display:flex; transition:transform 0.6s ease; }
+    .hero-slider .slide {
+      min-width:100%; padding:60px 40px 50px; text-align:center;
+      color:#fff; background:linear-gradient(145deg, var(--primary-dark), var(--primary-light));
+    }
+    .hero-slider .slide h1 { font-family:'Inter', sans-serif; font-size:3.2rem; font-weight:900; line-height:1.15; }
+    .hero-slider .slide h1 span { background:linear-gradient(135deg, var(--secondary-light), #fff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-slider .slide p { font-size:1.15rem; max-width:700px; margin:16px auto 28px; opacity:0.9; }
+    .slider-controls { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:12px; z-index:5; }
+    .slider-controls .dot { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,0.3); cursor:pointer; transition:0.3s; }
+    .slider-controls .dot.active { background:var(--secondary); transform:scale(1.3); }
+    .slider-btn {
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,0.3); border:none; color:#fff; font-size:2rem;
+      padding:6px 14px; border-radius:30px; cursor:pointer; z-index:5;
+      backdrop-filter:blur(4px); transition:background 0.3s;
+    }
+    .slider-btn:hover { background:rgba(0,0,0,0.5); }
+    .slider-btn.prev { left:16px; }
+    .slider-btn.next { right:16px; }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display:inline-block; padding:12px 32px; border-radius:60px;
+      font-weight:700; font-size:1rem; border:none; cursor:pointer;
+      transition:all var(--transition); font-family:'Inter', sans-serif;
+    }
+    .btn-primary { background:var(--secondary); color:#1a202c; box-shadow:0 8px 25px rgba(240,180,41,0.35); }
+    .btn-primary:hover { transform:translateY(-3px); box-shadow:0 14px 35px rgba(240,180,41,0.5); }
+    .btn-outline { background:transparent; border:2px solid rgba(255,255,255,0.5); color:#fff; }
+    .btn-outline:hover { background:#fff; color:var(--primary); }
+    .btn-sm { padding:6px 18px; font-size:0.8rem; border-radius:40px; border:none; background:var(--accent); color:#fff; cursor:pointer; transition:0.3s; font-weight:600; }
+    .btn-sm:hover { background:var(--primary-light); transform:scale(1.04); }
+    .btn-danger { background:#e53e3e; color:#fff; }
+    .btn-danger:hover { background:#c53030; transform:translateY(-3px); }
+
+    /* ===== Stats ===== */
+    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:24px; margin:40px 0 20px; }
+    .stat-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:24px 12px; text-align:center; transition:all var(--transition); }
+    .stat-card:hover { transform:translateY(-6px); box-shadow:var(--shadow); }
+    .stat-card .number { font-size:2.8rem; font-weight:900; color:var(--primary); font-family:'Inter', sans-serif; }
+    .stat-card .label { opacity:0.7; font-weight:600; margin-top:2px; }
+
+    /* ===== Section Title ===== */
+    .section-title { text-align:center; margin:50px 0 36px; }
+    .section-title h2 { font-family:'Inter', sans-serif; font-size:2.4rem; font-weight:800; }
+    .section-title h2 i { color:var(--secondary); margin-right:8px; }
+    .section-title h2 span { color:var(--accent); }
+    .section-title p { max-width:650px; margin:10px auto 0; opacity:0.7; }
+
+    /* ===== Cards ===== */
+    .grid-3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:30px; }
+    .grid-2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:30px; }
+    .card {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:var(--radius); padding:30px 24px;
+      transition:all var(--transition); box-shadow:var(--shadow);
+      text-align:center; position:relative; overflow:hidden;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0; width:100%; height:4px;
+      background:linear-gradient(90deg, var(--secondary), var(--accent));
+      transform:scaleX(0); transform-origin:left; transition:transform 0.4s;
+    }
+    .card:hover::before { transform:scaleX(1); }
+    .card:hover { transform:translateY(-8px); box-shadow:0 20px 50px rgba(0,0,0,0.1); }
+    .card .icon { font-size:3rem; color:var(--accent); margin-bottom:14px; display:block; }
+    .card h3 { font-family:'Inter', sans-serif; margin-bottom:6px; }
+    .card p { opacity:0.8; font-size:0.95rem; }
+
+    /* ===== Testimonial Carousel ===== */
+    .testimonial-carousel {
+      position:relative; overflow:hidden; border-radius:var(--radius);
+      background:var(--card-bg); border:1px solid var(--border);
+      padding:30px 20px; box-shadow:var(--shadow);
+    }
+    .testimonial-track { display:flex; transition:transform 0.5s ease; }
+    .testimonial-item { min-width:100%; padding:20px; text-align:center; }
+    .testimonial-item .quote { font-size:1.1rem; font-style:italic; opacity:0.9; }
+    .testimonial-item .author { font-weight:700; margin-top:12px; }
+    .carousel-dots { display:flex; justify-content:center; gap:10px; margin-top:16px; }
+    .carousel-dots .dot { width:10px; height:10px; border-radius:50%; background:var(--border); cursor:pointer; transition:0.3s; }
+    .carousel-dots .dot.active { background:var(--secondary); transform:scale(1.2); }
+
+    /* ===== Gallery ===== */
+    .gallery-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:18px; }
+    .gallery-item {
+      height:170px; border-radius:var(--radius); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:1.1rem; color:#fff;
+      text-shadow:0 4px 20px rgba(0,0,0,0.5);
+      transition:all var(--transition); cursor:pointer;
+      background-size:cover; background-position:center;
+      position:relative; overflow:hidden;
+    }
+    .gallery-item::after {
+      content:'\f002'; font-family:'Font Awesome 6 Free'; font-weight:900;
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%) scale(0); font-size:2rem; color:#fff;
+      background:rgba(0,0,0,0.3); padding:12px 16px; border-radius:50%;
+      transition:transform 0.3s;
+    }
+    .gallery-item:hover::after { transform:translate(-50%,-50%) scale(1); }
+    .gallery-item:hover { transform:scale(1.04); filter:brightness(0.9); }
+
+    .lightbox {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.85); z-index:9999;
+      justify-content:center; align-items:center; backdrop-filter:blur(8px);
+    }
+    .lightbox.open { display:flex; }
+    .lightbox img { max-width:90%; max-height:80%; border-radius:var(--radius); box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+    .lightbox .close-lightbox {
+      position:absolute; top:30px; right:40px; font-size:2.5rem; color:#fff;
+      cursor:pointer; transition:transform 0.3s;
+    }
+    .lightbox .close-lightbox:hover { transform:rotate(90deg); }
+
+    /* ===== FAQ ===== */
+    .faq-item {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:var(--radius); padding:18px 24px; margin-bottom:14px;
+      cursor:pointer; transition:background 0.3s;
+    }
+    .faq-item:hover { background:rgba(43,108,176,0.04); }
+    .faq-item .question { display:flex; justify-content:space-between; font-weight:700; }
+    .faq-item .answer { display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); opacity:0.85; }
+    .faq-item.active .answer { display:block; }
+    .faq-item.active .question i { transform:rotate(180deg); }
+
+    /* ===== Contact Form ===== */
+    .contact-form input, .contact-form textarea, .contact-form select {
+      width:100%; padding:12px 16px; border:1px solid var(--border);
+      border-radius:var(--radius); background:var(--card-bg);
+      color:var(--text); font-family:inherit; margin-bottom:14px;
+      transition:border 0.3s;
+    }
+    .contact-form input:focus, .contact-form textarea:focus, .contact-form select:focus {
+      outline:none; border-color:var(--accent);
+    }
+
+    /* ===== Scroll To Top ===== */
+    #scrollTop {
+      position:fixed; bottom:30px; right:30px;
+      background:var(--secondary); color:var(--primary-dark);
+      border:none; border-radius:50%; width:50px; height:50px;
+      font-size:1.4rem; cursor:pointer;
+      box-shadow:0 4px 20px rgba(240,180,41,0.4);
+      transition:all 0.3s; z-index:999;
+      opacity:0; visibility:hidden; transform:translateY(20px);
+    }
+    #scrollTop.visible { opacity:1; visibility:visible; transform:translateY(0); }
+    #scrollTop:hover { background:var(--secondary-light); transform:scale(1.1); }
+
+    .whatsapp-float {
+      position:fixed; bottom:100px; right:30px;
+      background:#25d366; color:#fff; width:56px; height:56px;
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:2rem; box-shadow:0 4px 20px rgba(37,211,102,0.4);
+      z-index:999; transition:all 0.3s; text-decoration:none;
+    }
+    .whatsapp-float:hover { transform:scale(1.1); box-shadow:0 8px 30px rgba(37,211,102,0.5); }
+
+    /* ===== Footer ===== */
+    footer {
+      background:var(--card-bg); border-top:1px solid var(--border);
+      padding:40px 0 20px; margin-top:50px;
+    }
+    .footer-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:30px; }
+    .footer-grid h4 { font-family:'Inter', sans-serif; margin-bottom:12px; }
+    .footer-grid ul { list-style:none; }
+    .footer-grid ul li { margin-bottom:4px; opacity:0.7; }
+    .footer-grid ul li a { cursor:pointer; text-decoration:none; color:inherit; }
+    .footer-grid ul li a:hover { opacity:1; }
+    .footer-bottom { text-align:center; padding-top:20px; border-top:1px solid var(--border); margin-top:24px; font-size:0.85rem; opacity:0.6; }
+    .footer-social a { color:var(--text); margin-right:14px; font-size:1.3rem; opacity:0.6; transition:0.3s; }
+    .footer-social a:hover { opacity:1; color:var(--secondary); }
+
+    /* ===== Modal ===== */
+    .modal {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:rgba(0,0,0,0.6); z-index:9999;
+      justify-content:center; align-items:center; backdrop-filter:blur(4px);
+    }
+    .modal.open { display:flex; }
+    .modal-content {
+      background:var(--card-bg); border-radius:var(--radius);
+      padding:30px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);
+      position:relative;
+    }
+    .modal-close {
+      position:absolute; top:10px; right:15px; font-size:1.8rem;
+      cursor:pointer; opacity:0.6; transition:0.3s;
+    }
+    .modal-close:hover { opacity:1; transform:rotate(90deg); }
+
+    /* ===== Responsive ===== */
+    @media (max-width:768px) {
+      .hero-slider .slide h1 { font-size:2.2rem; }
+      .section-title h2 { font-size:1.8rem; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .sidebar { width:85vw; }
+      .slider-btn { display:none; }
+      .news-ticker { font-size:0.7rem; padding:4px 0; }
+      .logo-area .logo-text { font-size:1.1rem; }
+      .logo-area .hamburger { font-size:1.3rem; }
+      .header-search input { width:120px; }
+    }
+    @media (max-width:480px) {
+      .hero-slider .slide { padding:40px 20px 30px; }
+      .hero-slider .slide h1 { font-size:1.8rem; }
+      .stats-grid { grid-template-columns:1fr; }
+      .grid-2 { grid-template-columns:1fr; }
+      .whatsapp-float { width:48px; height:48px; font-size:1.6rem; bottom:80px; right:20px; }
+      #scrollTop { width:44px; height:44px; font-size:1.2rem; bottom:20px; right:20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== PROGRESS BAR ===== -->
+  <div id="progress-bar"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header id="mainHeader">
+    <div class="header-inner">
+      <div class="logo-area" id="logoArea" title="Click to open menu">
+        <span class="hamburger"><i class="fas fa-bars"></i></span>
+        <span class="logo-text"><i class="fas fa-graduation-cap"></i> Smart<span>Infinity</span></span>
+      </div>
+      <div class="header-controls">
+        <div class="header-search">
+          <input type="text" id="globalSearch" placeholder="Search..." onkeyup="liveSearch(event)" />
+          <button onclick="triggerSearch()"><i class="fas fa-search"></i></button>
+        </div>
+        <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+        <!-- ===== AUTH SECTION (Login / Logout) ===== -->
+        <div id="authSection">
+          <button class="login-btn" id="loginBtn" onclick="openModal('loginModal')">Login</button>
+          <div id="userProfile">
+            <span id="userNameDisplay"></span>
+            <button id="logoutBtn" onclick="logoutUser()">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== NEWS TICKER ===== -->
+  <div class="news-ticker" id="newsTicker">
+    <div class="ticker-content">
+      <span>📢 Admissions Open for 2026-27 – Apply Now!</span>
+      <span>🏆 CBSE Toppers 2025 – Congratulations!</span>
+      <span>🤖 AI Workshop for Students – Register by Jan 30</span>
+      <span>📅 Annual Sports Meet – May 5-7</span>
+      <span>🌟 Smart School Ranked #1 in City – 5th Year!</span>
+    </div>
+  </div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo-text"><i class="fas fa-graduation-cap"></i> Smart<span>Infinity</span></span>
+      <button class="sidebar-close" id="sidebarClose"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="sidebar-category">Public</div>
+      <a data-page="home" class="active"><span class="icon">🏠</span> Home</a>
+      <a data-page="about"><span class="icon">📖</span> About</a>
+      <a data-page="admissions"><span class="icon">📝</span> Admissions</a>
+      <a data-page="academics"><span class="icon">📚</span> Academics</a>
+      <a data-page="facilities"><span class="icon">🏛️</span> Facilities</a>
+      <a data-page="gallery"><span class="icon">🖼️</span> Gallery</a>
+      <a data-page="events"><span class="icon">📅</span> Events</a>
+      <a data-page="news"><span class="icon">📰</span> News</a>
+      <a data-page="testimonials"><span class="icon">⭐</span> Testimonials</a>
+      <a data-page="alumni"><span class="icon">🎓</span> Alumni</a>
+      <a data-page="careers"><span class="icon">💼</span> Careers</a>
+      <a data-page="blog"><span class="icon">📝</span> Blog</a>
+      <a data-page="contact"><span class="icon">📞</span> Contact</a>
+      <a data-page="faq"><span class="icon">❓</span> FAQ</a>
+
+      <div class="sidebar-category">Academics & Facilities</div>
+      <a data-page="staff"><span class="icon">👩‍🏫</span> Staff</a>
+      <a data-page="library"><span class="icon">📚</span> Library</a>
+      <a data-page="sports"><span class="icon">⚽</span> Sports</a>
+      <a data-page="transport"><span class="icon">🚌</span> Transport</a>
+      <a data-page="hostel"><span class="icon">🏠</span> Hostel</a>
+      <a data-page="cafeteria"><span class="icon">🍽️</span> Cafeteria</a>
+      <a data-page="board"><span class="icon">📋</span> Board</a>
+
+      <div class="sidebar-category">Portals</div>
+      <a data-page="parent"><span class="icon">👨‍👩‍👦</span> Parent</a>
+      <a data-page="student"><span class="icon">🧑‍🎓</span> Student</a>
+      <a data-page="teacher"><span class="icon">👨‍🏫</span> Teacher</a>
+      <a data-page="staffportal"><span class="icon">👩‍💼</span> Staff</a>
+
+      <div class="sidebar-category">Management</div>
+      <a data-page="fee"><span class="icon">💳</span> Fee</a>
+      <a data-page="attendance"><span class="icon">📈</span> Attendance</a>
+      <a data-page="exam"><span class="icon">📝</span> Exam</a>
+      <a data-page="virtualtour"><span class="icon">🌐</span> Virtual Tour</a>
+      <a data-page="downloads"><span class="icon">📥</span> Downloads</a>
+
+      <div class="sidebar-category">Extra Features</div>
+      <a data-page="visitor"><span class="icon">🚪</span> Visitor Mgmt</a>
+      <a data-page="complaint"><span class="icon">📢</span> Complaints</a>
+      <a data-page="lostfound"><span class="icon">🔍</span> Lost & Found</a>
+      <a data-page="emergency"><span class="icon">🚨</span> Emergency Alerts</a>
+      <a data-page="eventreg"><span class="icon">📋</span> Event Registration</a>
+      <a data-page="certificate"><span class="icon">📜</span> Certificate Gen</a>
+      <a data-page="doccenter"><span class="icon">📁</span> Document Center</a>
+      <a data-page="calendar"><span class="icon">📆</span> Calendar</a>
+      <a data-page="holiday"><span class="icon">🏖️</span> Holiday Mgmt</a>
+
+      <div class="sidebar-category">Admin</div>
+      <a data-page="admin"><span class="icon">⚙️</span> Admin Dashboard</a>
+    </nav>
+    <div class="sidebar-footer">© 2026 Smart Infinity</div>
+  </aside>
+
+  <!-- ===== LOGIN MODAL ===== -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('loginModal')">&times;</span>
+      <h2 style="text-align:center;margin-bottom:20px;">🔐 Login</h2>
+      <form onsubmit="handleLogin(event)">
+        <input type="email" placeholder="Email" required style="width:100%;padding:12px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;" />
+        <input type="password" placeholder="Password" required style="width:100%;padding:12px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;" />
+        <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+        <p style="margin-top:12px;text-align:center;font-size:0.85rem;opacity:0.7;">
+          Don't have an account? <a href="#" onclick="closeModal('loginModal');openModal('registerModal');" style="color:var(--accent);">Register</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== REGISTER MODAL ===== -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('registerModal')">&times;</span>
+      <h2 style="text-align:center;margin-bottom:20px;">📝 Register</h2>
+      <form onsubmit="handleRegister(event)">
+        <input type="text" id="regFullName" placeholder="Full Name" required style="width:100%;padding:12px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;" />
+        <input type="email" id="regEmail" placeholder="Email" required style="width:100%;padding:12px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;" />
+        <input type="password" id="regPassword" placeholder="Password" required style="width:100%;padding:12px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;" />
+        <select id="regRole" style="width:100%;padding:12px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;">
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+          <option value="parent">Parent</option>
+          <option value="staff">Staff</option>
+        </select>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Register</button>
+        <p style="margin-top:12px;text-align:center;font-size:0.85rem;opacity:0.7;">
+          Already have an account? <a href="#" onclick="closeModal('registerModal');openModal('loginModal');" style="color:var(--accent);">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+  ALL PAGES (30+)
+  ============================================================ -->
+
+  <!-- ===== PAGE: HOME ===== -->
+  <section id="page-home" class="page active">
+    <div class="container">
+      <div class="hero-slider" id="heroSlider">
+        <div class="slides" id="heroSlides">
+          <div class="slide">
+            <h1>🌟 Welcome to <span>Smart Infinity</span> School</h1>
+            <p>शिक्षा का नया अध्याय – स्मार्ट, सुरक्षित, और डिजिटल।</p>
+            <div>
+              <button class="btn btn-primary" onclick="navigateTo('admissions')">📝 Apply Now</button>
+              <button class="btn btn-outline" onclick="navigateTo('about')" style="margin-left:12px;">🧐 Learn More</button>
+            </div>
+          </div>
+          <div class="slide" style="background:linear-gradient(145deg,#1b3a5c,#2b6cb0);">
+            <h1>🏆 Ranked <span>#1</span> in the City</h1>
+            <p>5 consecutive years of excellence.</p>
+            <button class="btn btn-primary" onclick="navigateTo('about')">Discover Why</button>
+          </div>
+          <div class="slide" style="background:linear-gradient(145deg,#2d3748,#4a5568);">
+            <h1>🚀 <span>Future-Ready</span> Education</h1>
+            <p>STEM, AI, Robotics, and Digital Skills.</p>
+            <button class="btn btn-primary" onclick="navigateTo('academics')">Explore Programs</button>
+          </div>
+        </div>
+        <button class="slider-btn prev" id="sliderPrev"><i class="fas fa-chevron-left"></i></button>
+        <button class="slider-btn next" id="sliderNext"><i class="fas fa-chevron-right"></i></button>
+        <div class="slider-controls" id="sliderDots"></div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="number" data-count="3200">0</div><div class="label">Students</div></div>
+        <div class="stat-card"><div class="number" data-count="180">0</div><div class="label">Teachers</div></div>
+        <div class="stat-card"><div class="number" data-count="98.5">0</div><div class="label">Pass Rate %</div></div>
+        <div class="stat-card"><div class="number" data-count="45">0</div><div class="label">Countries</div></div>
+        <div class="stat-card"><div class="number" data-count="30">0</div><div class="label">Awards</div></div>
+      </div>
+
+      <div class="section-title"><h2><i class="fas fa-star"></i> Why <span>Smart Infinity</span> ?</h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span><h3>Expert Teachers</h3><p>Highly qualified educators.</p><button class="btn-sm" onclick="navigateTo('staff')">Meet Our Team</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-laptop-code"></i></span><h3>Smart Classrooms</h3><p>Digital boards, AI tools.</p><button class="btn-sm" onclick="navigateTo('facilities')">Explore</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-futbol"></i></span><h3>Sports & Arts</h3><p>Holistic development.</p><button class="btn-sm" onclick="navigateTo('sports')">See More</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-bus"></i></span><h3>Safe Transport</h3><p>GPS-tracked buses.</p><button class="btn-sm" onclick="navigateTo('transport')">Details</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-hand-holding-heart"></i></span><h3>Scholarships</h3><p>Merit-based support.</p><button class="btn-sm" onclick="navigateTo('admissions')">Apply</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-users"></i></span><h3>Parent Portal</h3><p>Track attendance, fees.</p><button class="btn-sm" onclick="navigateTo('parent')">Login</button></div>
+      </div>
+
+      <div class="section-title"><h2><i class="fas fa-quote-right"></i> What <span>Parents Say</span></h2></div>
+      <div class="testimonial-carousel" id="testimonialCarousel">
+        <div class="testimonial-track" id="testimonialTrack">
+          <div class="testimonial-item"><p class="quote">"The school has transformed my child's confidence."</p><p class="author">– Mr. & Mrs. Sharma</p></div>
+          <div class="testimonial-item"><p class="quote">"Excellent infrastructure, caring teachers."</p><p class="author">– Ms. Priya</p></div>
+          <div class="testimonial-item"><p class="quote">"My son loves the robotics lab and sports."</p><p class="author">– Dr. Rajesh</p></div>
+        </div>
+        <div class="carousel-dots" id="testimonialDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: ABOUT ===== -->
+  <section id="page-about" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-info-circle"></i> About <span>Us</span></h2><p>Our mission, vision, and history.</p></div>
+      <div class="grid-2">
+        <div class="card" style="text-align:left;">
+          <h3>🎯 Our Mission</h3><p>To provide world-class education fostering critical thinking, creativity, and character.</p><br>
+          <h3>🌟 Our Vision</h3><p>To become a global leader in K-12 education.</p><br>
+          <h3>📜 Our History</h3><p>Founded in 2005, now with 3,200+ students and 180+ faculty.</p>
+        </div>
+        <div class="card" style="text-align:left;">
+          <h3>🏆 Why Choose Us?</h3>
+          <ul style="list-style:none;margin-top:10px;">
+            <li>✅ Innovative STEM + Arts curriculum</li>
+            <li>✅ State-of-the-art infrastructure</li>
+            <li>✅ Global exchange programs</li>
+            <li>✅ 360° development</li>
+            <li>✅ Individual mentorship</li>
+          </ul>
+          <button class="btn-sm" style="margin-top:16px;" onclick="navigateTo('contact')">Talk to Us</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: ADMISSIONS ===== -->
+  <section id="page-admissions" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-pen-fancy"></i> <span>Admissions</span> 2026-27</h2><p>Online application, tracking, and approval.</p></div>
+      <div class="grid-2">
+        <div class="card" style="text-align:left;">
+          <h3>📝 How to Apply?</h3>
+          <p>Fill online form, upload documents, get application number.</p>
+          <br><p><i class="fas fa-check-circle" style="color:var(--accent);"></i> Instant application number</p>
+          <p><i class="fas fa-check-circle" style="color:var(--accent);"></i> Real-time status tracking</p>
+          <p><i class="fas fa-check-circle" style="color:var(--accent);"></i> Download receipt</p>
+          <button class="btn btn-primary" style="margin-top:18px;" onclick="showToast('📝 Admission form opened!','info')">📩 Apply Now</button>
+        </div>
+        <div class="card" style="text-align:left;">
+          <h3>📅 Important Dates</h3>
+          <ul style="list-style:none;margin-top:10px;">
+            <li>🔹 Opens: Jan 15, 2026</li>
+            <li>🔹 Deadline: Mar 31, 2026</li>
+            <li>🔹 Entrance exam: Apr 10, 2026</li>
+            <li>🔹 Results: Apr 25, 2026</li>
+            <li>🔹 Commencement: Jun 1, 2026</li>
+          </ul>
+          <br><h3>📋 Requirements</h3>
+          <ul style="list-style:none;"><li>📄 Birth Certificate</li><li>📄 Previous Records</li><li>📄 Passport Photo</li><li>📄 Parent ID</li></ul>
+          <button class="btn-sm" style="margin-top:16px;" onclick="navigateTo('faq')">❓ FAQs</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: ACADEMICS ===== -->
+  <section id="page-academics" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-book-open"></i> Our <span>Academics</span></h2><p>Science, Arts, Commerce, Technology, Languages, Sports.</p></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-flask"></i></span><h3>Science & Tech</h3><p>Physics, Chemistry, Biology, CS with labs.</p><button class="btn-sm" onclick="navigateTo('facilities')">View Labs</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-paint-brush"></i></span><h3>Arts & Humanities</h3><p>Literature, History, Music, Drama.</p><button class="btn-sm" onclick="navigateTo('events')">See Events</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-chart-line"></i></span><h3>Commerce & Mgmt</h3><p>Economics, Accountancy, Business.</p><button class="btn-sm" onclick="navigateTo('careers')">Careers</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-globe-americas"></i></span><h3>Languages</h3><p>English, Spanish, French, German, Sanskrit.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-dumbbell"></i></span><h3>Physical Education</h3><p>Sports, Yoga, Fitness.</p><button class="btn-sm" onclick="navigateTo('sports')">Sports</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-robot"></i></span><h3>AI & Digital Skills</h3><p>Coding, Data Science, AI from Grade 6.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: FACILITIES ===== -->
+  <section id="page-facilities" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-building"></i> Our <span>Facilities</span></h2><p>World-class amenities.</p></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-microscope"></i></span><h3>Science Labs</h3><p>Modern labs for Physics, Chemistry, Biology.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-book"></i></span><h3>Library</h3><p>20,000+ books, digital resources.</p><button class="btn-sm" onclick="navigateTo('library')">Visit</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-basketball-ball"></i></span><h3>Sports Complex</h3><p>Indoor/outdoor courts.</p><button class="btn-sm" onclick="navigateTo('sports')">Explore</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-bus"></i></span><h3>Transport</h3><p>GPS-tracked buses.</p><button class="btn-sm" onclick="navigateTo('transport')">Routes</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-utensils"></i></span><h3>Cafeteria</h3><p>Nutritious meals.</p><button class="btn-sm" onclick="navigateTo('cafeteria')">Menu</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-wifi"></i></span><h3>Smart Classrooms</h3><p>Interactive boards, high-speed internet.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-hospital"></i></span><h3>Medical Room</h3><p>Qualified nurse, first-aid.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-shield-alt"></i></span><h3>Security</h3><p>24x7 CCTV, guards.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: GALLERY ===== -->
+  <section id="page-gallery" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-images"></i> <span>Gallery</span></h2><p>Click to view larger.</p></div>
+      <div class="gallery-grid">
+        <div class="gallery-item" style="background:linear-gradient(135deg,#1a365d,#2b6cb0);" data-img="https://picsum.photos/seed/campus/800/500">🏫 Campus</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#e8a838,#f6c96a);" data-img="https://picsum.photos/seed/lab/800/500">🔬 Lab</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#38a169,#68d391);" data-img="https://picsum.photos/seed/sports/800/500">⚽ Sports</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#d53f8c,#ed64a6);" data-img="https://picsum.photos/seed/cultural/800/500">🎭 Cultural</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#3182ce,#63b3ed);" data-img="https://picsum.photos/seed/library/800/500">📚 Library</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#d69e2e,#f6c96a);" data-img="https://picsum.photos/seed/awards/800/500">🏆 Awards</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#6b46c1,#9f7aea);" data-img="https://picsum.photos/seed/smartclass/800/500">🖥️ Smart Class</div>
+        <div class="gallery-item" style="background:linear-gradient(135deg,#e53e3e,#fc8181);" data-img="https://picsum.photos/seed/graduation/800/500">🎓 Graduation</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: EVENTS ===== -->
+  <section id="page-events" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-calendar-alt"></i> Upcoming <span>Events</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-flask" style="color:var(--secondary);"></i></span><h3>Science Fair 2026</h3><p>April 15</p><button class="btn-sm" onclick="navigateTo('contact')">Register</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-running" style="color:var(--secondary);"></i></span><h3>Annual Sports Meet</h3><p>May 5-7</p><button class="btn-sm" onclick="navigateTo('contact')">Register</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-music" style="color:var(--secondary);"></i></span><h3>Cultural Fest</h3><p>June 20</p><button class="btn-sm" onclick="navigateTo('contact')">Register</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-robot" style="color:var(--secondary);"></i></span><h3>AI Workshop</h3><p>July 10-12</p><button class="btn-sm" onclick="navigateTo('contact')">Register</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: NEWS ===== -->
+  <section id="page-news" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-newspaper"></i> <span>News</span></h2></div>
+      <div class="grid-3">
+        <div class="card" style="text-align:left;"><h4>🏆 CBSE Toppers 2025</h4><p>Our students top ranks.</p><span style="opacity:0.6;">Mar 10, 2026</span><button class="btn-sm" style="margin-top:8px;" onclick="showToast('📰 Full news article will be displayed.','info')">Read More</button></div>
+        <div class="card" style="text-align:left;"><h4>🏗️ New Academic Block</h4><p>20 smart classrooms.</p><span style="opacity:0.6;">Feb 20, 2026</span><button class="btn-sm" onclick="showToast('📰 Full news article will be displayed.','info')">Read More</button></div>
+        <div class="card" style="text-align:left;"><h4>🤖 AI Workshop</h4><p>3-day workshop.</p><span style="opacity:0.6;">Jan 28, 2026</span><button class="btn-sm" onclick="showToast('📰 Full news article will be displayed.','info')">Read More</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: TESTIMONIALS ===== -->
+  <section id="page-testimonials" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-quote-left"></i> <span>Testimonials</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-quote-right"></i></span><p>"Amazing teachers!"</p><h4>– Mrs. Sharma</h4></div>
+        <div class="card"><span class="icon"><i class="fas fa-quote-right"></i></span><p>"Excellent environment."</p><h4>– Mr. Verma</h4></div>
+        <div class="card"><span class="icon"><i class="fas fa-quote-right"></i></span><p>"I love the labs."</p><h4>– Riya</h4></div>
+        <div class="card"><span class="icon"><i class="fas fa-quote-right"></i></span><p>"Best school in the city."</p><h4>– Dr. Gupta</h4></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: ALUMNI ===== -->
+  <section id="page-alumni" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-user-graduate"></i> <span>Alumni</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-user-tie"></i></span><h3>Ankit Gupta</h3><p>Google</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-md"></i></span><h3>Priya Singh</h3><p>AIIMS Doctor</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-graduate"></i></span><h3>Rahul Jain</h3><p>Harvard MBA</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-astronaut"></i></span><h3>Neha Reddy</h3><p>NASA Engineer</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: CAREERS ===== -->
+  <section id="page-careers" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-briefcase"></i> <span>Careers</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><h3>🧮 Mathematics Teacher</h3><p>3+ years</p><button class="btn-sm" onclick="showToast('📝 Application form opened.','info')">Apply</button></div>
+        <div class="card"><h3>📖 English Teacher</h3><p>2+ years</p><button class="btn-sm" onclick="showToast('📝 Application form opened.','info')">Apply</button></div>
+        <div class="card"><h3>⚽ Sports Coach</h3><p>Certified</p><button class="btn-sm" onclick="showToast('📝 Application form opened.','info')">Apply</button></div>
+        <div class="card"><h3>💻 IT Admin</h3><p>2+ years</p><button class="btn-sm" onclick="showToast('📝 Application form opened.','info')">Apply</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: BLOG ===== -->
+  <section id="page-blog" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-blog"></i> <span>Blog</span></h2></div>
+      <div class="grid-3">
+        <div class="card" style="text-align:left;"><h3>🔬 Careers in Science</h3><p>Explore science careers.</p><button class="btn-sm" onclick="showToast('📝 Blog article will open.','info')">Read More</button></div>
+        <div class="card" style="text-align:left;"><h3>🧘 Mental Health</h3><p>Tips for students.</p><button class="btn-sm" onclick="showToast('📝 Blog article will open.','info')">Read More</button></div>
+        <div class="card" style="text-align:left;"><h3>💻 Digital Education</h3><p>Online learning.</p><button class="btn-sm" onclick="showToast('📝 Blog article will open.','info')">Read More</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: CONTACT ===== -->
+  <section id="page-contact" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-phone-alt"></i> <span>Contact</span> Us</h2></div>
+      <div class="grid-2">
+        <div class="card" style="text-align:left;">
+          <p><i class="fas fa-map-marker-alt"></i> 123, Shiksha Marg, Smart Nagar, India</p>
+          <p><i class="fas fa-phone-alt"></i> +91 98765 43210</p>
+          <p><i class="fas fa-envelope"></i> info@smartschool.edu</p>
+          <div class="footer-social"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-instagram"></i></a></div>
+        </div>
+        <form class="contact-form card" onsubmit="showToast('✅ Message sent!','success'); return false;">
+          <input type="text" placeholder="Your Name" required />
+          <input type="email" placeholder="Email" required />
+          <textarea rows="4" placeholder="Message"></textarea>
+          <button type="submit" class="btn btn-primary" style="width:100%;">📨 Send</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: FAQ ===== -->
+  <section id="page-faq" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-question-circle"></i> <span>FAQ</span></h2></div>
+      <div class="faq-item"><div class="question">Admission criteria? <i class="fas fa-chevron-down"></i></div><div class="answer">Based on entrance test and interview.</div></div>
+      <div class="faq-item"><div class="question">Transport? <i class="fas fa-chevron-down"></i></div><div class="answer">Yes, GPS-tracked buses.</div></div>
+      <div class="faq-item"><div class="question">Fee structure? <i class="fas fa-chevron-down"></i></div><div class="answer">Varies by class. Contact office.</div></div>
+      <div class="faq-item"><div class="question">Scholarships? <i class="fas fa-chevron-down"></i></div><div class="answer">Yes, merit and need-based.</div></div>
+      <div class="faq-item"><div class="question">Hostel available? <i class="fas fa-chevron-down"></i></div><div class="answer">Yes, separate for boys & girls.</div></div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: STAFF ===== -->
+  <section id="page-staff" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-chalkboard-teacher"></i> Our <span>Staff</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-user-circle"></i></span><h3>Dr. Sunita</h3><p>Principal</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-circle"></i></span><h3>Mr. Rajesh</h3><p>Maths Head</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-circle"></i></span><h3>Mrs. Anjali</h3><p>English Teacher</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-circle"></i></span><h3>Mr. Suresh</h3><p>Sports Coach</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-circle"></i></span><h3>Dr. Priya</h3><p>Science Head</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-user-circle"></i></span><h3>Ms. Kavita</h3><p>Art Teacher</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: LIBRARY ===== -->
+  <section id="page-library" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-book"></i> <span>Library</span></h2></div>
+      <div class="card" style="max-width:800px;margin:0 auto;text-align:left;">
+        <p><strong>📚 Collection:</strong> 20,000+ books, 5,000+ e-books.</p>
+        <p><strong>🕒 Timings:</strong> Mon-Fri 8-5, Sat 9-2.</p>
+        <button class="btn-sm" onclick="navigateTo('contact')">Visit Us</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: SPORTS ===== -->
+  <section id="page-sports" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-futbol"></i> <span>Sports</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-futbol"></i></span><h3>Football</h3><p>Inter-school tournaments.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-basketball-ball"></i></span><h3>Basketball</h3><p>Indoor court.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-swimmer"></i></span><h3>Swimming</h3><p>Heated pool.</p></div>
+        <div class="card"><span class="icon"><i class="fas fa-table-tennis"></i></span><h3>Table Tennis</h3><p>Indoor facilities.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: TRANSPORT ===== -->
+  <section id="page-transport" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-bus"></i> <span>Transport</span></h2></div>
+      <div class="card" style="max-width:800px;margin:0 auto;text-align:left;">
+        <p><strong>🚌 Fleet:</strong> 20+ GPS-tracked buses with CCTV.</p>
+        <p><strong>📱 Tracking:</strong> Real-time app for parents.</p>
+        <button class="btn-sm" onclick="navigateTo('contact')">Enquire</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: HOSTEL ===== -->
+  <section id="page-hostel" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-hotel"></i> <span>Hostel</span></h2></div>
+      <div class="card" style="max-width:800px;margin:0 auto;text-align:left;">
+        <p><strong>🏠 Separate Hostels:</strong> Boys & girls, 24x7 security.</p>
+        <p><strong>🍽️ Meals:</strong> Nutritious vegetarian.</p>
+        <button class="btn-sm" onclick="navigateTo('contact')">Book Visit</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: CAFETERIA ===== -->
+  <section id="page-cafeteria" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-utensils"></i> <span>Cafeteria</span></h2></div>
+      <div class="card" style="max-width:800px;margin:0 auto;text-align:left;">
+        <p><strong>🍳 Timings:</strong> Breakfast 7:30-8:30, Lunch 12:30-1:30.</p>
+        <p><strong>🥗 Menu:</strong> Vegetarian, vegan, gluten-free options.</p>
+        <button class="btn-sm" onclick="navigateTo('contact')">Full Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: BOARD ===== -->
+  <section id="page-board" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-users-cog"></i> School <span>Board</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><h3>Mr. Arvind Mehta</h3><p>Chairman</p></div>
+        <div class="card"><h3>Dr. Sudha Rao</h3><p>Vice Chairperson</p></div>
+        <div class="card"><h3>Mr. Prakash Iyer</h3><p>Secretary</p></div>
+        <div class="card"><h3>Mrs. Meera Nair</h3><p>Treasurer</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: PARENT ===== -->
+  <section id="page-parent" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-user-friends"></i> <span>Parent</span> Portal</h2></div>
+      <div class="grid-2">
+        <div class="card" style="text-align:left;"><h3>👨‍👩‍👦 Features</h3><ul><li>✅ Attendance tracking</li><li>✅ Fee payment</li><li>✅ Homework</li><li>✅ Results</li><li>✅ Teacher communication</li></ul></div>
+        <div class="card" style="text-align:center;">
+          <button class="btn btn-primary" style="width:100%;" onclick="showToast('🔐 Parent Login page will open.','info')">🔐 Login</button>
+          <button class="btn btn-outline" style="width:100%;margin-top:10px;border-color:var(--border);color:var(--text);" onclick="showToast('📝 Registration form will open.','info')">📝 Register</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: STUDENT ===== -->
+  <section id="page-student" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-user-graduate"></i> <span>Student</span> Portal</h2></div>
+      <div class="grid-2">
+        <div class="card" style="text-align:left;"><h3>🧑‍🎓 Features</h3><ul><li>✅ Digital ID card</li><li>✅ Timetable</li><li>✅ Homework</li><li>✅ Results</li><li>✅ Certificates</li></ul></div>
+        <div class="card" style="text-align:center;">
+          <button class="btn btn-primary" style="width:100%;" onclick="showToast('🔐 Student Login page will open.','info')">🔐 Login</button>
+          <button class="btn btn-outline" style="width:100%;margin-top:10px;" onclick="showToast('📋 Registration form will open.','info')">📋 Register</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: TEACHER ===== -->
+  <section id="page-teacher" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-chalkboard-teacher"></i> <span>Teacher</span> Portal</h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-user-check"></i></span><h3>Attendance</h3><p>Mark daily attendance</p><button class="btn-sm" onclick="showToast('📋 Attendance panel opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-upload"></i></span><h3>Homework Upload</h3><p>Assign homework</p><button class="btn-sm" onclick="showToast('📤 Homework panel opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-pen"></i></span><h3>Marks Entry</h3><p>Enter exam marks</p><button class="btn-sm" onclick="showToast('✏️ Marks entry panel opened.','info')">Open</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: STAFF PORTAL ===== -->
+  <section id="page-staffportal" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-user-cog"></i> <span>Staff</span> Portal</h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-clock"></i></span><h3>Attendance</h3><p>Mark staff attendance</p><button class="btn-sm" onclick="showToast('📋 Staff attendance opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-calendar-check"></i></span><h3>Leave Request</h3><p>Apply for leave</p><button class="btn-sm" onclick="showToast('📝 Leave request form opened.','info')">Apply</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-file-invoice"></i></span><h3>Pay Slip</h3><p>View salary slips</p><button class="btn-sm" onclick="showToast('📄 Pay slips displayed.','info')">View</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: FEE ===== -->
+  <section id="page-fee" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-coins"></i> Fee <span>Management</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-money-bill-wave"></i></span><h3>Pay Online</h3><p>UPI, Card, Net Banking</p><button class="btn-sm" onclick="showToast('💳 Payment gateway will open.','info')">Pay</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-history"></i></span><h3>History</h3><p>View past transactions</p><button class="btn-sm" onclick="showToast('📜 Payment history displayed.','info')">View</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-file-invoice"></i></span><h3>Invoices</h3><p>Download receipts</p><button class="btn-sm" onclick="showToast('📄 Invoices downloading...','info')">Download</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-bell"></i></span><h3>Reminders</h3><p>Due alerts</p><button class="btn-sm" onclick="showToast('⏰ Reminder settings opened.','info')">Configure</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: ATTENDANCE ===== -->
+  <section id="page-attendance" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-clipboard-check"></i> <span>Attendance</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-calendar-day"></i></span><h3>Daily</h3><p>Mark today's attendance</p><button class="btn-sm" onclick="showToast('📅 Daily attendance report opened.','info')">View</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-chart-pie"></i></span><h3>Monthly Reports</h3><p>Analytics</p><button class="btn-sm" onclick="showToast('📊 Monthly report opened.','info')">View</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-bell"></i></span><h3>Absence Alerts</h3><p>Parent notifications</p><button class="btn-sm" onclick="showToast('🔔 Alert settings opened.','info')">Configure</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: EXAM ===== -->
+  <section id="page-exam" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-pen"></i> Exam <span>Management</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-plus-circle"></i></span><h3>Create Exam</h3><p>Schedule exams</p><button class="btn-sm" onclick="showToast('📝 Create exam panel opened.','info')">Create</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-table"></i></span><h3>Seating Plan</h3><p>Generate seating</p><button class="btn-sm" onclick="showToast('🪑 Seating plan generated.','info')">Generate</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-file-alt"></i></span><h3>Report Cards</h3><p>Generate marksheets</p><button class="btn-sm" onclick="showToast('📄 Report cards generated.','info')">Generate</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: VIRTUAL TOUR ===== -->
+  <section id="page-virtualtour" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-vr-cardboard"></i> <span>Virtual Tour</span></h2></div>
+      <div class="card" style="max-width:800px;margin:0 auto;">
+        <p>360° virtual walk through our campus.</p>
+        <div style="background:var(--bg);padding:40px;border-radius:var(--radius);text-align:center;">
+          <i class="fas fa-vr-cardboard" style="font-size:4rem;color:var(--secondary);"></i>
+          <p>Coming Soon!</p>
+          <button class="btn-sm" onclick="navigateTo('contact')">Notify Me</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: DOWNLOADS ===== -->
+  <section id="page-downloads" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-download"></i> <span>Downloads</span></h2></div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-file-pdf"></i></span><h3>Brochure</h3><button class="btn-sm" onclick="showToast('📄 Downloading Brochure...','info')">Download</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-file-pdf"></i></span><h3>Admission Form</h3><button class="btn-sm" onclick="showToast('📄 Downloading Admission Form...','info')">Download</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-file-pdf"></i></span><h3>Fee Structure</h3><button class="btn-sm" onclick="showToast('📄 Downloading Fee Structure...','info')">Download</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-file-pdf"></i></span><h3>Academic Calendar</h3><button class="btn-sm" onclick="showToast('📄 Downloading Academic Calendar...','info')">Download</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: VISITOR MANAGEMENT ===== -->
+  <section id="page-visitor" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-door-open"></i> Visitor <span>Management</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Log visitor entry/exit, generate visitor passes.</p>
+        <button class="btn-sm" onclick="showToast('🚪 Visitor log entry opened.','info')">Log Entry</button>
+        <button class="btn-sm" onclick="showToast('📊 Visitor report displayed.','info')">View Reports</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: COMPLAINTS ===== -->
+  <section id="page-complaint" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-bullhorn"></i> Complaint <span>Management</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Submit complaints, track resolution status.</p>
+        <button class="btn-sm" onclick="showToast('📝 Complaint form opened.','info')">Submit</button>
+        <button class="btn-sm" onclick="showToast('📋 Complaint tracking opened.','info')">Track</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: LOST & FOUND ===== -->
+  <section id="page-lostfound" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-search"></i> Lost & <span>Found</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Report lost items, claim found items.</p>
+        <button class="btn-sm" onclick="showToast('📝 Report lost item form opened.','info')">Report Lost</button>
+        <button class="btn-sm" onclick="showToast('📋 Found items list displayed.','info')">View Found</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: EMERGENCY ALERTS ===== -->
+  <section id="page-emergency" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-exclamation-triangle"></i> Emergency <span>Alerts</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Send emergency notifications to all stakeholders.</p>
+        <button class="btn btn-danger" onclick="showToast('🚨 Emergency alert sent to all!','error')">Send Alert</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: EVENT REGISTRATION ===== -->
+  <section id="page-eventreg" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-calendar-check"></i> Event <span>Registration</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Register for upcoming events, manage slots.</p>
+        <button class="btn-sm" onclick="showToast('📝 Event registration form opened.','info')">Register</button>
+        <button class="btn-sm" onclick="showToast('📋 Registrations list displayed.','info')">View Registrations</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: CERTIFICATE GENERATOR ===== -->
+  <section id="page-certificate" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-award"></i> Certificate <span>Generator</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Generate certificates for students (achievement, participation).</p>
+        <button class="btn-sm" onclick="showToast('📜 Certificate generation opened.','info')">Generate</button>
+        <button class="btn-sm" onclick="showToast('📄 Certificate downloading...','info')">Download</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: DOCUMENT CENTER ===== -->
+  <section id="page-doccenter" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-folder-open"></i> Document <span>Center</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Upload, manage, and share school documents.</p>
+        <button class="btn-sm" onclick="showToast('📁 Upload document dialog opened.','info')">Upload</button>
+        <button class="btn-sm" onclick="showToast('📋 Document list displayed.','info')">View</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: CALENDAR ===== -->
+  <section id="page-calendar" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-calendar-alt"></i> School <span>Calendar</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>View academic calendar, holidays, events.</p>
+        <button class="btn-sm" onclick="showToast('📆 Calendar view opened.','info')">View Calendar</button>
+        <button class="btn-sm" onclick="showToast('📝 Add event form opened.','info')">Add Event</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: HOLIDAY MANAGEMENT ===== -->
+  <section id="page-holiday" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-umbrella-beach"></i> Holiday <span>Management</span></h2></div>
+      <div class="card" style="max-width:600px;margin:0 auto;text-align:left;">
+        <p>Define school holidays, vacation schedules.</p>
+        <button class="btn-sm" onclick="showToast('🏖️ Add holiday form opened.','info')">Add Holiday</button>
+        <button class="btn-sm" onclick="showToast('📋 Holiday list displayed.','info')">View Holidays</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: ADMIN DASHBOARD ===== -->
+  <section id="page-admin" class="page">
+    <div class="container">
+      <div class="section-title"><h2><i class="fas fa-chart-pie"></i> Admin <span>Dashboard</span></h2></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="number">3200</div><div class="label">Students</div></div>
+        <div class="stat-card"><div class="number">180</div><div class="label">Teachers</div></div>
+        <div class="stat-card"><div class="number">₹45L</div><div class="label">Revenue (This Month)</div></div>
+        <div class="stat-card"><div class="number">92%</div><div class="label">Attendance</div></div>
+      </div>
+      <div class="grid-3">
+        <div class="card"><span class="icon"><i class="fas fa-users"></i></span><h3>Manage Users</h3><button class="btn-sm" onclick="showToast('👥 User management opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-book"></i></span><h3>Manage Classes</h3><button class="btn-sm" onclick="showToast('📚 Class management opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-money-bill"></i></span><h3>Fee Reports</h3><button class="btn-sm" onclick="showToast('📊 Fee reports opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-chart-bar"></i></span><h3>Analytics</h3><button class="btn-sm" onclick="showToast('📈 Analytics dashboard opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-cog"></i></span><h3>Settings</h3><button class="btn-sm" onclick="showToast('⚙️ Settings opened.','info')">Open</button></div>
+        <div class="card"><span class="icon"><i class="fas fa-database"></i></span><h3>Backup</h3><button class="btn-sm" onclick="showToast('💾 Backup started!','success')">Run Backup</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+  FOOTER
+  ============================================================ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div><h4>🏫 Smart Infinity</h4><p style="opacity:0.7;">Innovation in education since 2005.</p></div>
+        <div><h4>Quick Links</h4><ul><li><a onclick="navigateTo('home')">Home</a></li><li><a onclick="navigateTo('admissions')">Admissions</a></li><li><a onclick="navigateTo('academics')">Academics</a></li><li><a onclick="navigateTo('contact')">Contact</a></li></ul></div>
+        <div><h4>Resources</h4><ul><li><a onclick="navigateTo('parent')">Parent Portal</a></li><li><a onclick="navigateTo('student')">Student Portal</a></li><li><a onclick="navigateTo('staffportal')">Staff</a></li><li><a onclick="navigateTo('careers')">Careers</a></li></ul></div>
+        <div>
+          <h4>Connect</h4>
+          <div class="footer-social">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div style="margin-top:12px;">
+            <input type="email" placeholder="Subscribe" style="padding:8px 12px;border-radius:30px;border:1px solid var(--border);background:var(--bg);color:var(--text);width:100%;">
+            <button class="btn-sm" style="margin-top:8px;width:100%;" onclick="showToast('✅ Subscribed!','success')">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">&copy; 2026 Smart Infinity – All Rights Reserved. <i class="fas fa-heart" style="color:var(--secondary);"></i></div>
+    </div>
+  </footer>
+
+  <!-- ===== FLOATING BUTTONS ===== -->
+  <button id="scrollTop" title="Go to top"><i class="fas fa-arrow-up"></i></button>
+  <a href="https://wa.me/919876543210" target="_blank" class="whatsapp-float" title="Chat"><i class="fab fa-whatsapp"></i></a>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox" id="lightbox">
+    <span class="close-lightbox" id="closeLightbox">&times;</span>
+    <img id="lightboxImg" src="" alt="Gallery image" />
+  </div>
+
+  <!-- ============================================================
+  JAVASCRIPT (Complete – All Features + Real Login/Logout)
+  ============================================================ -->
+  <script>
+    // ============================================================
+    // 1. TOAST SYSTEM
+    // ============================================================
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
+    // ============================================================
+    // 2. API BASE URL
+    // ============================================================
+    const API_BASE = 'http://localhost:8000/api/v1';
+
+    // ============================================================
+    // 3. USER STATE MANAGEMENT (Login/Logout UI)
+    // ============================================================
+    function updateUserUI() {
+      const userStr = localStorage.getItem('user');
+      const loginBtn = document.getElementById('loginBtn');
+      const userProfile = document.getElementById('userProfile');
+      const userNameDisplay = document.getElementById('userNameDisplay');
+
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        if (loginBtn) { loginBtn.style.display = 'none'; loginBtn.style.visibility = 'hidden'; }
+        if (userProfile) { userProfile.style.display = 'flex'; userProfile.style.visibility = 'visible'; }
+        if (userNameDisplay) { userNameDisplay.textContent = '👋 ' + user.full_name; }
+      } else {
+        if (loginBtn) { loginBtn.style.display = 'inline-block'; loginBtn.style.visibility = 'visible'; }
+        if (userProfile) { userProfile.style.display = 'none'; userProfile.style.visibility = 'hidden'; }
+      }
+    }
+
+    function logoutUser() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      updateUserUI();
+      showToast('👋 Logged out successfully', 'info');
+      navigateTo('home');
+    }
+
+    // ============================================================
+    // 4. LOGIN FUNCTION (Real API)
+    // ============================================================
+    async function loginUser(email, password) {
+      try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showToast(`✅ Login successful! Welcome ${data.user.full_name}`, 'success');
+          updateUserUI();
+          return true;
+        } else {
+          showToast('❌ ' + (data.detail || 'Invalid credentials'), 'error');
+          return false;
+        }
+      } catch (error) {
+        showToast('❌ Network error. Is the backend running?', 'error');
+        return false;
+      }
+    }
+
+    // ============================================================
+    // 5. REGISTER FUNCTION (Real API)
+    // ============================================================
+    async function registerUser(email, password, full_name, role = 'student') {
+      try {
+        const response = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, full_name, role })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          showToast('✅ Registration successful! Please login.', 'success');
+          closeModal('registerModal');
+          openModal('loginModal');
+          return true;
+        } else {
+          showToast('❌ ' + (data.detail || 'Registration failed'), 'error');
+          return false;
+        }
+      } catch (error) {
+        showToast('❌ Network error. Is the backend running?', 'error');
+        return false;
+      }
+    }
+
+    // ============================================================
+    // 6. HANDLE LOGIN (From Modal)
+    // ============================================================
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.querySelector('#loginModal input[type="email"]')?.value.trim();
+      const password = document.querySelector('#loginModal input[type="password"]')?.value.trim();
+      if (email && password) {
+        loginUser(email, password);
+      } else {
+        showToast('❌ Please fill in all fields', 'error');
+      }
+    }
+
+    // ============================================================
+    // 7. HANDLE REGISTER (From Modal)
+    // ============================================================
+    function handleRegister(e) {
+      e.preventDefault();
+      const full_name = document.getElementById('regFullName')?.value.trim();
+      const email = document.getElementById('regEmail')?.value.trim();
+      const password = document.getElementById('regPassword')?.value.trim();
+      const role = document.getElementById('regRole')?.value || 'student';
+      if (full_name && email && password) {
+        registerUser(email, password, full_name, role);
+      } else {
+        showToast('❌ Please fill in all fields', 'error');
+      }
+    }
+
+    // ============================================================
+    // 8. NAVIGATION & SIDEBAR
+    // ============================================================
+    function navigateTo(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.add('active');
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      const link = document.querySelector('.sidebar-nav a[data-page="' + pageId + '"]');
+      if (link) link.classList.add('active');
+      closeSidebar();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (pageId === 'home') { currentSlide = 0; updateSlider(); }
+    }
+
+    document.querySelectorAll('.sidebar-nav a[data-page]').forEach(a => {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        navigateTo(this.getAttribute('data-page'));
+      });
+    });
+
+    // ============================================================
+    // 9. SIDEBAR
+    // ============================================================
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); document.body.style.overflow = ''; }
+    document.getElementById('logoArea').addEventListener('click', openSidebar);
+    document.getElementById('sidebarClose').addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+
+    // ============================================================
+    // 10. THEME
+    // ============================================================
+    const themeToggle = document.getElementById('themeToggle');
+    const storedTheme = localStorage.getItem('theme') || 'dark';
+    if (storedTheme === 'light') { document.documentElement.setAttribute('data-theme', 'light'); themeToggle.innerHTML = '<i class="fas fa-sun"></i>'; }
+    else { themeToggle.innerHTML = '<i class="fas fa-moon"></i>'; }
+    themeToggle.addEventListener('click', function() {
+      const current = document.documentElement.getAttribute('data-theme');
+      if (current === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+      }
+    });
+
+    // ============================================================
+    // 11. HERO SLIDER
+    // ============================================================
+    let currentSlide = 0;
+    const slides = document.querySelector('#heroSlides');
+    const totalSlides = slides.children.length;
+    const dotsContainer = document.getElementById('sliderDots');
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', function() { goToSlide(parseInt(this.dataset.index)); });
+      dotsContainer.appendChild(dot);
+    }
+    function updateSlider() {
+      slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+      document.querySelectorAll('#sliderDots .dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentSlide);
+      });
+    }
+    function goToSlide(index) { currentSlide = (index + totalSlides) % totalSlides; updateSlider(); }
+    document.getElementById('sliderNext').addEventListener('click', function() { goToSlide(currentSlide + 1); });
+    document.getElementById('sliderPrev').addEventListener('click', function() { goToSlide(currentSlide - 1); });
+    let slideInterval = setInterval(() => { goToSlide(currentSlide + 1); }, 5000);
+    document.getElementById('heroSlider').addEventListener('mouseenter', () => clearInterval(slideInterval));
+    document.getElementById('heroSlider').addEventListener('mouseleave', () => {
+      slideInterval = setInterval(() => { goToSlide(currentSlide + 1); }, 5000);
+    });
+
+    // ============================================================
+    // 12. ANIMATED COUNTERS
+    // ============================================================
+    function animateCounters() {
+      document.querySelectorAll('.stat-card .number').forEach(el => {
+        const target = parseFloat(el.dataset.count);
+        let current = 0;
+        const increment = target / 40;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) { current = target; clearInterval(timer); }
+          el.textContent = Math.floor(current);
+        }, 30);
+      });
+    }
+    if (document.querySelector('#page-home.active')) animateCounters();
+    const homeObserver = new MutationObserver(() => {
+      if (document.querySelector('#page-home.active')) {
+        document.querySelectorAll('.stat-card .number').forEach(el => el.textContent = '0');
+        animateCounters();
+      }
+    });
+    homeObserver.observe(document.querySelector('#page-home'), { attributes: true, attributeFilter: ['class'] });
+
+    // ============================================================
+    // 13. TESTIMONIAL CAROUSEL
+    // ============================================================
+    let testiIndex = 0;
+    const testiTrack = document.getElementById('testimonialTrack');
+    const testiItems = testiTrack.children;
+    const testiDots = document.getElementById('testimonialDots');
+    for (let i = 0; i < testiItems.length; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.addEventListener('click', function() { goToTesti(parseInt(this.dataset.index)); });
+      testiDots.appendChild(dot);
+    }
+    function goToTesti(index) {
+      testiIndex = (index + testiItems.length) % testiItems.length;
+      testiTrack.style.transform = `translateX(-${testiIndex * 100}%)`;
+      document.querySelectorAll('#testimonialDots .dot').forEach((d, idx) => {
+        d.classList.toggle('active', idx === testiIndex);
+      });
+    }
+    setInterval(() => { goToTesti(testiIndex + 1); }, 4000);
+
+    // ============================================================
+    // 14. GALLERY LIGHTBOX
+    // ============================================================
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    document.querySelectorAll('.gallery-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const imgSrc = this.dataset.img;
+        lightboxImg.src = imgSrc;
+        lightbox.classList.add('open');
+      });
+    });
+    document.getElementById('closeLightbox').addEventListener('click', () => lightbox.classList.remove('open'));
+    lightbox.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+
+    // ============================================================
+    // 15. FAQ
+    // ============================================================
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', function() {
+        this.classList.toggle('active');
+      });
+    });
+
+    // ============================================================
+    // 16. SCROLL EFFECTS
+    // ============================================================
+    const progressBar = document.getElementById('progress-bar');
+    const header = document.getElementById('mainHeader');
+    const ticker = document.getElementById('newsTicker');
+    const scrollBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (scrollTop / docHeight * 100) + '%';
+      if (scrollTop > 60) { header.classList.add('scrolled'); ticker.classList.add('scrolled'); }
+      else { header.classList.remove('scrolled'); ticker.classList.remove('scrolled'); }
+      scrollBtn.classList.toggle('visible', scrollTop > 400);
+    });
+    scrollBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+    // ============================================================
+    // 17. MODAL & SEARCH
+    // ============================================================
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    function liveSearch(e) {
+      const query = e.target.value.toLowerCase();
+      if (query.length > 1) {
+        document.querySelectorAll('.page').forEach(p => {
+          const text = p.textContent.toLowerCase();
+          p.style.display = text.includes(query) ? 'block' : 'none';
+        });
+      } else {
+        document.querySelectorAll('.page').forEach(p => p.style.display = '');
+      }
+    }
+    function triggerSearch() {
+      const input = document.getElementById('globalSearch');
+      const query = input.value.toLowerCase();
+      if (query.length > 1) {
+        let found = false;
+        document.querySelectorAll('.page').forEach(p => {
+          const text = p.textContent.toLowerCase();
+          if (text.includes(query)) { p.style.display = 'block'; found = true; }
+          else { p.style.display = 'none'; }
+        });
+        if (!found) showToast('No page found for "' + query + '"', 'error');
+      } else {
+        document.querySelectorAll('.page').forEach(p => p.style.display = '');
+      }
+    }
+
+    // ============================================================
+    // 18. DEFAULT + UPDATE UI ON LOAD
+    // ============================================================
+    if (!document.querySelector('.page.active')) navigateTo('home');
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateUserUI();
+    });
+  </script>
+</body>
+</html>
